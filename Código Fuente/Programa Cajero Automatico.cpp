@@ -230,8 +230,11 @@ void realizarTransferencia(int indice) {
 	}
 	
 	if (monto > usuarios[indice].saldo) {
-		printf("\nSaldo insuficiente.\n");
+		printf("\nEl monto supera el saldo disponible en tu cuenta.\n");
+	} else if (monto >= 400) {
+		printf("\nExcede el monto permitido de $400.\n");
 	} else {
+		
 		usuarios[indice].saldo -= monto;
 		usuarios[indiceDestino].saldo += monto;
 		char descripcionOrigen[50], descripcionDestino[50];
@@ -311,7 +314,7 @@ int validarMultiploDe10(int cantidad) {
 }
 
 int obtenerNumero(const char *mensaje) {
-
+	
 	int numero;
 	printf("%s", mensaje);
 	while (scanf("%d", &numero) != 1 || getchar() != '\n') {
