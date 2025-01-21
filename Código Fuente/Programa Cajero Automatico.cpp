@@ -13,6 +13,7 @@ typedef struct {
 	int numero_cuenta;
 	char contrasena[20];
 	float saldo;
+	int cuenta_destino[MAX_MOVIMIENTOS]; 
 	char movimientos[MAX_MOVIMIENTOS][50];
 	char fechas[MAX_MOVIMIENTOS][20]; // Nueva columna para almacenar fecha y hora
 	int indice_movimientos;
@@ -215,6 +216,7 @@ void realizarDeposito(int indice) {
 void realizarTransferencia(int indice) {
 	printf("\n--- Transferencia ---\n");
 	int cuentaDestino = obtenerNumero("Ingrese el número de cuenta destino: ");
+	
 	if (cuentaDestino == usuarios[indice].numero_cuenta) {
 		printf("\nError: No puede transferir a la misma cuenta.\n");
 		system("pause");
@@ -247,34 +249,64 @@ void realizarTransferencia(int indice) {
 	} else if (monto >= 400) {
 		printf("\nExcede el monto permitido de $400.\n");
 	} else {
-		
+		// Actualizar saldos
 		usuarios[indice].saldo -= monto;
 		usuarios[indiceDestino].saldo += monto;
+		
+		// Registrar el movimiento en ambas cuentas
 		char descripcionOrigen[50], descripcionDestino[50];
 		sprintf(descripcionOrigen, "TRANSFERENCIA -$%.2f", monto);
 		sprintf(descripcionDestino, "TRANSFERENCIA +$%.2f", monto);
+		
+		// Registrar los movimientos en los respectivos usuarios
 		registrarMovimiento(&usuarios[indice], descripcionOrigen);
 		registrarMovimiento(&usuarios[indiceDestino], descripcionDestino);
-		registrarFechaMovimiento(&usuarios[indice]);       // Registrar fecha y hora en origen
-		registrarFechaMovimiento(&usuarios[indiceDestino]); // Registrar fecha y hora en destino
+		
+		// Registrar la fecha y hora del movimiento en ambas cuentas
+		registrarFechaMovimiento(&usuarios[indice]);  // Registrar fecha en origen
+		registrarFechaMovimiento(&usuarios[indiceDestino]); // Registrar fecha en destino
+		
+		// Registrar la cuenta destino en el arreglo
+		usuarios[indice].cuenta_destino[usuarios[indice].indice_movimientos % MAX_MOVIMIENTOS] = cuentaDestino;
+		usuarios[indiceDestino].cuenta_destino[usuarios[indiceDestino].indice_movimientos % MAX_MOVIMIENTOS] = usuarios[indice].numero_cuenta;
+		
 		printf("\nTransferencia realizada exitosamente. Saldo actual: $%.2f\n", usuarios[indice].saldo);
 	}
 	system("pause");
 }
 
+
 void estadoDeCuenta(int indice) {
 	printf("\n--- Estado de Cuenta ---\n");
 	printf("Nombre: %s\n", usuarios[indice].nombre);
 	printf("Número de Cuenta: %d\n", usuarios[indice].numero_cuenta);
-	printf("Saldo: $%.2f\n", usuarios[indice].saldo);
 	printf("\nUltimos Movimientos:\n");
 	
+	// Mostrar los últimos movimientos
 	for (int i = 0; i < MAX_MOVIMIENTOS; i++) {
 		int pos = (usuarios[indice].indice_movimientos - i - 1 + MAX_MOVIMIENTOS) % MAX_MOVIMIENTOS;
+		
 		if (strlen(usuarios[indice].movimientos[pos]) > 0) {
-			printf("%d: %s - %s\n", i + 1, usuarios[indice].movimientos[pos], usuarios[indice].fechas[pos]); // Mostramos fecha y hora
+			if (strstr(usuarios[indice].movimientos[pos], "Transferencia") != NULL) {
+				// Si el movimiento es una transferencia, mostramos la cuenta destino
+				printf("%d: %s - %s | Transferido a cuenta: %d\n", 
+					   i + 1, 
+					   usuarios[indice].movimientos[pos], 
+					   usuarios[indice].fechas[pos],
+					   usuarios[indice].cuenta_destino[pos]);
+			} else {
+				// Mostrar el movimiento normal
+				printf("%d: %s - %s\n", 
+					   i + 1, 
+					   usuarios[indice].movimientos[pos], 
+					   usuarios[indice].fechas[pos]);
+			}
 		}
 	}
+	
+	// Imprimir saldo al final
+	printf("\nSaldo actual: $%.2f\n", usuarios[indice].saldo);
+	
 	system("pause");
 }
 
