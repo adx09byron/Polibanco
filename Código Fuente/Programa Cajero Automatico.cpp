@@ -16,6 +16,8 @@ typedef struct {
 	char movimientos[MAX_MOVIMIENTOS][50];
 	char fechas[MAX_MOVIMIENTOS][20]; // Nueva columna para almacenar fecha y hora
 	int indice_movimientos;
+	int intentos_fallidos; //Nuevo campo para contar los intentos fallidos
+	int cuenta_bloqueada; //Nuevo campo para indicar si la cuenta esta bloqueada
 } Usuario;
 
 Usuario usuarios[MAX_USUARIOS];
@@ -50,10 +52,19 @@ int main() {
 		
 		for (int i = 0; i < MAX_USUARIOS; i++) {
 			if (usuarios[i].numero_cuenta == numeroCuenta) {
+				if (usuarios[i].cuenta_bloqueada) {
+					printf("\nCuenta bloqueada por múltiples intentos fallidos.\n");
+					return 1;  // Salir de la función principal si la cuenta está bloqueada
+				}
 				if (verificarContrasena(i)) {
 					indiceUsuario = i;
 				} else {
 					printf("\nContraseña incorrecta. Intente de nuevo.\n");
+					usuarios[i].intentos_fallidos++; // Incrementar el contador de intentos fallidos
+					if (usuarios[i].intentos_fallidos >= 3) {
+						usuarios[i].cuenta_bloqueada = 1;  // Bloquear la cuenta
+						printf("\nNúmero máximo de intentos alcanzado. La cuenta ha sido bloqueada.\n");
+					}
 				}
 				break;
 			}
@@ -108,6 +119,8 @@ void inicializarUsuarios() {
 		sprintf(usuarios[i].contrasena, "$0%dUsuario", i + 1);
 		usuarios[i].saldo = 100.0f; // Saldo inicial
 		usuarios[i].indice_movimientos = 0;
+		usuarios[i].intentos_fallidos = 0;  // Inicializar los intentos fallidos
+		usuarios[i].cuenta_bloqueada = 0;   // Inicializar como no bloqueada
 		for (int j = 0; j < MAX_MOVIMIENTOS; j++) {
 			usuarios[i].movimientos[j][0] = '\0';
 			usuarios[i].fechas[j][0] = '\0'; // Inicializamos las fechas
@@ -346,5 +359,9 @@ void obtenerContrasena(const char *mensaje, char *contrasena, int tamano) {
 int verificarContrasena(int indice) {
 	char contrasenaIngresada[20];
 	obtenerContrasena("Ingrese su contraseña: ", contrasenaIngresada, 20);
+	if (strcmp(usuarios[indice].contrasena, contrasenaIngresada) == 0) {
+		usuarios[indice].intentos_fallidos = 0;  // Restablecer intentos fallidos
+		return 1;
+	}
 	return strcmp(usuarios[indice].contrasena, contrasenaIngresada) == 0;
 }
