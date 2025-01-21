@@ -324,7 +324,7 @@ void registrarFechaMovimiento(Usuario *usuario) {
 	struct tm *tiempoLocal = localtime(&ahora); // Convierte a tiempo local
 	
 	// Guarda la fecha y hora en el índice correspondiente, usando el módulo para evitar desbordamiento
-	strftime(usuario->fechas[usuario->indice_movimientos++ % MAX_MOVIMIENTOS], 20, "%d/%m/%Y %H:%M", tiempoLocal);
+	strftime(usuario->fechas[(usuario->indice_movimientos-1) % MAX_MOVIMIENTOS], 20, "%d/%m/%Y %H:%M", tiempoLocal);
 	
 	// Incrementa el índice de movimientos
 	
