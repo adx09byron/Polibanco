@@ -139,8 +139,8 @@ void realizarRetiro(int indice) {
 	case 5: monto = 50; break;
 	case 6:
 		monto = obtenerNumero("Ingrese un monto múltiplo de 10: ");
-		if (!validarMultiploDe10(monto) || monto <= 0) {
-			printf("\nEl monto debe ser múltiplo de 10 y mayor a 0. Operación cancelada.\n");
+		if (!validarMultiploDe10(monto) || monto <= 0 || monto >= 400) {
+			printf("\nEl monto debe ser múltiplo de 10, mayor que cero y no superar los $400.00.\n Operación cancelada.\n");
 			system("pause");
 			return;
 		}
