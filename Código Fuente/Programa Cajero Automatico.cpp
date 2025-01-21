@@ -5,7 +5,7 @@
 #include <time.h>  // Para obtener fecha y hora
 
 #define MAX_USUARIOS 5
-#define MAX_MOVIMIENTOS 3
+#define MAX_MOVIMIENTOS 10
 
 // Estructura para almacenar la información del usuario
 typedef struct {
@@ -279,31 +279,7 @@ void estadoDeCuenta(int indice) {
 }
 
 // Nueva función para exportar estado de cuenta a un archivo .txt
-void exportarEstadoDeCuenta(int indice) {
-	FILE *archivo = fopen("EstadoCuenta.txt", "w");
-	if (archivo == NULL) {
-		printf("\nError al crear el archivo.\n");
-		system("pause");
-		return;
-	}
-	
-	fprintf(archivo, "--- Estado de Cuenta ---\n");
-	fprintf(archivo, "Nombre: %s\n", usuarios[indice].nombre);
-	fprintf(archivo, "Numero de Cuenta: %d\n", usuarios[indice].numero_cuenta);
-	fprintf(archivo, "Saldo: $%.2f\n", usuarios[indice].saldo);
-	fprintf(archivo, "\nUltimos Movimientos:\n");
-	
-	for (int i = 0; i < MAX_MOVIMIENTOS; i++) {
-		int pos = (usuarios[indice].indice_movimientos - i - 1 + MAX_MOVIMIENTOS) % MAX_MOVIMIENTOS;
-		if (strlen(usuarios[indice].movimientos[pos]) > 0) {
-			fprintf(archivo, "%d: %s - %s\n", i + 1, usuarios[indice].movimientos[pos], usuarios[indice].fechas[pos]); // Escribimos fecha y hora
-		}
-	}
-	
-	fclose(archivo);
-	printf("\nEl estado de cuenta se ha exportado exitosamente al archivo 'EstadoCuenta.txt'.\n");
-	system("pause");
-}
+
 
 void registrarMovimiento(Usuario *usuario, const char *descripcion) {
 	strncpy(usuario->movimientos[usuario->indice_movimientos % MAX_MOVIMIENTOS], descripcion, 50);
@@ -320,6 +296,42 @@ void registrarFechaMovimiento(Usuario *usuario) {
 	
 	// Incrementa el índice de movimientos
 	
+}
+void exportarEstadoDeCuenta(int indice) {
+	FILE *archivo = fopen("EstadoCuenta.txt", "w");
+	if (archivo == NULL) {
+		perror("\nError al crear el archivo");  // Usar perror para mostrar el error real del sistema
+		system("pause");
+		return;
+	}
+	
+	// Escritura del encabezado
+	fprintf(archivo, "--- Estado de Cuenta ---\n");
+	fprintf(archivo, "Nombre: %s\n", usuarios[indice].nombre);
+	fprintf(archivo, "Numero de Cuenta: %d\n", usuarios[indice].numero_cuenta);
+	fprintf(archivo, "Saldo: $%.2f\n", usuarios[indice].saldo);
+	fprintf(archivo, "\nUltimos Movimientos:\n");
+	
+	// Escribir los últimos movimientos
+	int movimientos_mostrados = 0;
+	for (int i = 0; i < MAX_MOVIMIENTOS && movimientos_mostrados < MAX_MOVIMIENTOS; i++) {
+		int pos = (usuarios[indice].indice_movimientos - i - 1 + MAX_MOVIMIENTOS) % MAX_MOVIMIENTOS;
+		if (strlen(usuarios[indice].movimientos[pos]) > 0) {
+			fprintf(archivo, "%d: %s - %s\n", i + 1, usuarios[indice].movimientos[pos], usuarios[indice].fechas[pos]);
+			movimientos_mostrados++;
+		}
+	}
+	
+	// Cerrar el archivo correctamente
+	if (fclose(archivo) != 0) {
+		perror("\nError al cerrar el archivo");
+		system("pause");
+		return;
+	}
+	
+	// Mensaje de éxito
+	printf("\nEl estado de cuenta se ha exportado exitosamente al archivo 'EstadoCuenta.txt'.\n");
+	system("pause");
 }
 
 int validarMultiploDe10(int cantidad) {
