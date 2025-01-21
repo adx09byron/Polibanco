@@ -1,0 +1,9 @@
+--- Estado de Cuenta ---
+Nombre: Usuario 1
+Numero de Cuenta: 202501
+Saldo: $85.00
+
+Ultimos Movimientos:
+1: DEPOSITO +$100.00 - 21/01/2025 10:35
+2: TRANSFERENCIA -$55.00 - 21/01/2025 10:34
+3: RETIRO -$60.00 - 21/01/2025 10:35
