@@ -44,6 +44,10 @@ int main() {
 	
 	do {
 		system("cls");
+		printf("**************************************\n");
+		printf("*        BIENVENIDX AL POLIBANCO      *\n");
+		printf("**************************************\n");
+		
 		printf("\nIngrese su número de cuenta: ");
 		int numeroCuenta = obtenerNumero("");
 		
@@ -75,6 +79,9 @@ int main() {
 	
 	do {
 		system("cls");
+		printf("**************************************\n");
+		printf("*        BIENVENIDX AL POLIBANCO      *\n");
+		printf("**************************************\n");
 		mostrarMenuPrincipal();
 		opcion = obtenerNumero("Seleccione una opción: ");
 		
