@@ -153,8 +153,18 @@ void realizarRetiro(int indice) {
 	case 5: monto = 50; break;
 	case 6:
 		monto = obtenerNumero("Ingrese un monto múltiplo de 10: ");
-		if (!validarMultiploDe10(monto) || monto <= 0 || monto >= 400) {
-			printf("\nEl monto debe ser múltiplo de 10, mayor que cero y no superar los $400.00.\n Operación cancelada.\n");
+		if (!validarMultiploDe10(monto)) {
+			printf("\nEl monto debe ser múltiplo de 10. Operación cancelada.\n");
+			system("pause");
+			return;
+		}
+		if (monto <= 0) {
+			printf("\nEl monto debe ser mayor que cero. Operación cancelada.\n");
+			system("pause");
+			return;
+		}
+		if (monto > 400) {
+			printf("\nEl monto no debe superar los $400. Operación cancelada.\n");
 			system("pause");
 			return;
 		}
@@ -192,8 +202,18 @@ void realizarDeposito(int indice) {
 	case 5: monto = 50; break;
 	case 6:
 		monto = obtenerNumero("Ingrese un monto múltiplo de 10: ");
-		if (!validarMultiploDe10(monto) || monto <= 0) {
-			printf("\nEl monto debe ser múltiplo de 10 y mayor a 0. Operación cancelada.\n");
+		if (!validarMultiploDe10(monto)) {
+			printf("\nEl monto debe ser múltiplo de 10. Operación cancelada.\n");
+			system("pause");
+			return;
+		}
+		if (monto <= 0) {
+			printf("\nEl monto debe ser mayor que cero. Operación cancelada.\n");
+			system("pause");
+			return;
+		}
+		if (monto > 1000) {
+			printf("\nEl monto no debe superar los $1000. Operación cancelada.\n");
 			system("pause");
 			return;
 		}
@@ -212,6 +232,7 @@ void realizarDeposito(int indice) {
 	printf("\nDepósito realizado exitosamente. Saldo actual: $%.2f\n", usuarios[indice].saldo);
 	system("pause");
 }
+
 
 void realizarTransferencia(int indice) {
 	printf("\n--- Transferencia ---\n");
