@@ -1,5 +1,5 @@
 # Polibanco: Flujo de Trabajo en Git
-Este repositorio contiene el desarrollo de un sistema de cajero automático para el banco ficticio "PoliBanco", implementado en C y Python. El proyecto simula las operaciones típicas de un cajero automático, ofreciendo una experiencia intuitiva para los usuarios y cumpliendo con buenas prácticas de programación.
+Este repositorio contiene el desarrollo de un sistema de cajero automático para el banco ficticio "PoliBanco", implementado en C. El proyecto simula las operaciones típicas de un cajero automático, ofreciendo una experiencia intuitiva para los usuarios y cumpliendo con buenas prácticas de programación.
 # Branching, Commits y Merge
 
 Este repositorio sigue un flujo de trabajo organizado que permite el desarrollo eficiente de nuevas funcionalidades, corrección de errores y mejoras. A continuación, se describe el proceso de **branching**, **commits** y **merge** seguido en el desarrollo del proyecto, así como una descripción de las modificaciones realizadas.
