@@ -25,7 +25,7 @@ Durante el desarrollo del proyecto, se crearon diferentes ramas para abordar tar
 
 - **Commit:** Se modificó la función `registrarMovimiento` para corregir un problema donde las fechas no se imprimían correctamente en ciertos movimientos al visualizar el estado de cuenta. Se ajustó el uso de `strftime`, restando 1 en lugar de sumarlo, lo que solucionó el error de impresión.
   
-- **Merge:** La fusión de esta rama con `develop` se realizó sin conflictos, logrando una integración exitosa.
+- **Merge:** La fusión de esta rama con `main` se realizó sin conflictos, logrando una integración exitosa.
 
 #### **Branch: mejora-estadocuenta**
 
@@ -65,7 +65,7 @@ Durante el desarrollo del proyecto, se crearon diferentes ramas para abordar tar
 
 ### 2. **Conflictos y Resolución**
 
-Durante el proceso de fusión, se presentó un pequeño conflicto al intentar fusionar la rama `mejora-transferencia` con `develop`. El conflicto ocurrió en el archivo `transferencia.c`, donde ambas ramas habían modificado la misma sección de código. La solución fue:
+Durante el proceso de fusión, se presentó un pequeño conflicto al intentar fusionar la rama `mejora-transferencia` con `main`. El conflicto ocurrió en el archivo `Programa Cajero Automatico.cpp`, donde ambas ramas habían modificado la misma sección de código. La solución fue:
 
 1. **Identificación del conflicto:** El conflicto ocurrió porque ambas ramas cambiaron el límite de la cantidad de transferencia en el mismo bloque de código.
    
@@ -75,7 +75,7 @@ Durante el proceso de fusión, se presentó un pequeño conflicto al intentar fu
 
 ### 3. **Merge Final y Estrategia de Integración**
 
-Las ramas se fusionaron en `develop` de manera ordenada, con cada funcionalidad revisada y probada antes de ser integrada. Las fusiones a `main` se realizaron una vez que todas las características fueron verificadas y listas para producción.
+Las ramas se fusionaron en `main` de manera ordenada, con cada funcionalidad revisada y probada. Las fusiones a `main` se realizaron una vez que todas las características fueron verificadas y listas su ejecución.
 
 ### 4. **Evidencias de los Conflictos Resueltos**
 
