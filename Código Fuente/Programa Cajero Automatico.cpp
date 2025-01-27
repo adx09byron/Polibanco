@@ -3,6 +3,7 @@
 #include <string.h>
 #include <conio.h> // Incluimos conio.h para getch()
 #include <time.h>  // Para obtener fecha y hora
+#include <windows.h> 
 
 #define MAX_USUARIOS 5
 #define MAX_MOVIMIENTOS 10
@@ -19,8 +20,10 @@ typedef struct {
 	int indice_movimientos;
 	int intentos_fallidos; //Nuevo campo para contar los intentos fallidos
 	int cuenta_bloqueada; //Nuevo campo para indicar si la cuenta esta bloqueada
+	time_t tiempo_bloqueo;
 } Usuario;
 
+//Declaración de Funciones del Proyecto
 Usuario usuarios[MAX_USUARIOS];
 
 int obtenerNumero(const char *mensaje);
@@ -32,12 +35,14 @@ void realizarRetiro(int indice);
 void realizarDeposito(int indice);
 void realizarTransferencia(int indice);
 void estadoDeCuenta(int indice);
-void exportarEstadoDeCuenta(int indice); // Nueva función
+void exportarEstadoDeCuenta(int indice); 
 void registrarMovimiento(Usuario *usuario, const char *descripcion);
 void registrarFechaMovimiento(Usuario *usuario);
 int validarMultiploDe10(int cantidad);
 int verificarContrasena(int indice);
+void mostrarContador(int segundos_restantes);
 
+// Función Principal
 int main() {
 	inicializarUsuarios();
 	int opcion, indiceUsuario = -1;
@@ -51,30 +56,53 @@ int main() {
 		printf("\nIngrese su número de cuenta: ");
 		int numeroCuenta = obtenerNumero("");
 		
+		int cuentaValida = 0; // Indicador para saber si el número de cuenta existe
+		
 		for (int i = 0; i < MAX_USUARIOS; i++) {
 			if (usuarios[i].numero_cuenta == numeroCuenta) {
+				cuentaValida = 1; // La cuenta existe
+				
+				// Verificar si la cuenta está bloqueada
 				if (usuarios[i].cuenta_bloqueada) {
-					printf("\nCuenta bloqueada por múltiples intentos fallidos.\n");
-					return 1;  // Salir de la función principal si la cuenta está bloqueada
+					time_t tiempo_actual = time(NULL);
+					double diferencia_segundos = difftime(tiempo_actual, usuarios[i].tiempo_bloqueo);
+					
+					if (diferencia_segundos >= 12 * 3600) { // Si han pasado 12 horas
+						usuarios[i].cuenta_bloqueada = 0; // Desbloquear cuenta
+						usuarios[i].intentos_fallidos = 0; // Reiniciar intentos fallidos
+						printf("\nLa cuenta ha sido desbloqueada. Intente nuevamente.\n");
+						system("pause");
+					} else {
+						int segundos_restantes = (12 * 3600) - (int)diferencia_segundos;
+						mostrarContador(segundos_restantes); // Mostrar el contador dinámico
+						return 1; // Salir del programa temporalmente
+					}
 				}
+				
+				// Verificar contraseña
 				if (verificarContrasena(i)) {
-					indiceUsuario = i;
+					indiceUsuario = i; // Acceso concedido
 				} else {
 					printf("\nContraseña incorrecta. Intente de nuevo.\n");
-					usuarios[i].intentos_fallidos++; // Incrementar el contador de intentos fallidos
+					system("pause");
+					usuarios[i].intentos_fallidos++;
 					if (usuarios[i].intentos_fallidos >= 3) {
-						usuarios[i].cuenta_bloqueada = 1;  // Bloquear la cuenta
+						usuarios[i].cuenta_bloqueada = 1;
+						usuarios[i].tiempo_bloqueo = time(NULL); // Guardar el tiempo del bloqueo
 						printf("\nNúmero máximo de intentos alcanzado. La cuenta ha sido bloqueada.\n");
+						system("pause");
 					}
 				}
 				break;
 			}
 		}
 		
-		if (indiceUsuario == -1) {
+		
+		if (!cuentaValida) { // Si no se encontró ninguna cuenta válida
 			printf("\nNúmero de cuenta no válido. Intente de nuevo.\n");
 			system("pause");
 		}
+		
 	} while (indiceUsuario == -1);
 	
 	do {
@@ -113,22 +141,7 @@ int main() {
 	return 0;
 }
 
-void inicializarUsuarios() {
-	for (int i = 0; i < MAX_USUARIOS; i++) {
-		sprintf(usuarios[i].nombre, "Usuario %d", i + 1);
-		usuarios[i].numero_cuenta = 202501 + i;
-		sprintf(usuarios[i].contrasena, "$0%dUsuario", i + 1);
-		usuarios[i].saldo = 100.0f; // Saldo inicial
-		usuarios[i].indice_movimientos = 0;
-		usuarios[i].intentos_fallidos = 0;  // Inicializar los intentos fallidos
-		usuarios[i].cuenta_bloqueada = 0;   // Inicializar como no bloqueada
-		for (int j = 0; j < MAX_MOVIMIENTOS; j++) {
-			usuarios[i].movimientos[j][0] = '\0';
-			usuarios[i].fechas[j][0] = '\0'; // Inicializamos las fechas
-		}
-	}
-}
-
+//Función Menú
 void mostrarMenuPrincipal() {
 	printf("\n--- Menú Principal ---\n");
 	printf("1. Retiro\n");
@@ -139,6 +152,26 @@ void mostrarMenuPrincipal() {
 	printf("6. Salir\n");
 }
 
+//Función Inicializar Usuarios
+void inicializarUsuarios() {
+	for (int i = 0; i < MAX_USUARIOS; i++) {
+		sprintf(usuarios[i].nombre, "Usuario %d", i + 1);
+		usuarios[i].numero_cuenta = 202501 + i;
+		sprintf(usuarios[i].contrasena, "$0%dUsuario", i + 1);
+		usuarios[i].saldo = 100.0f; // Saldo inicial
+		usuarios[i].indice_movimientos = 0;
+		usuarios[i].intentos_fallidos = 0;  // Inicializar los intentos fallidos
+		usuarios[i].cuenta_bloqueada = 0;   // Inicializar como no bloqueada
+		usuarios[i].tiempo_bloqueo = 0;
+		for (int j = 0; j < MAX_MOVIMIENTOS; j++) {
+			usuarios[i].movimientos[j][0] = '\0';
+			usuarios[i].fechas[j][0] = '\0'; // Inicializamos las fechas
+		}
+	}
+}
+
+
+// Función Retiro
 void realizarRetiro(int indice) {
 	printf("\n--- Retiro ---\n");
 	printf("1. $10\n2. $20\n3. $30\n4. $40\n5. $50\n6. Otra cantidad\n");
@@ -188,6 +221,7 @@ void realizarRetiro(int indice) {
 	system("pause");
 }
 
+// Función Depósito
 void realizarDeposito(int indice) {
 	printf("\n--- Depósito ---\n");
 	printf("1. $10\n2. $20\n3. $30\n4. $40\n5. $50\n6. Otra cantidad\n");
@@ -233,7 +267,7 @@ void realizarDeposito(int indice) {
 	system("pause");
 }
 
-
+// Función Transferencia
 void realizarTransferencia(int indice) {
 	printf("\n--- Transferencia ---\n");
 	int cuentaDestino = obtenerNumero("Ingrese el número de cuenta destino: ");
@@ -296,7 +330,7 @@ void realizarTransferencia(int indice) {
 	system("pause");
 }
 
-
+// Función Estado de Cuenta
 void estadoDeCuenta(int indice) {
 	printf("\n--- Estado de Cuenta ---\n");
 	printf("Nombre: %s\n", usuarios[indice].nombre);
@@ -331,25 +365,7 @@ void estadoDeCuenta(int indice) {
 	system("pause");
 }
 
-// Nueva función para exportar estado de cuenta a un archivo .txt
-
-
-void registrarMovimiento(Usuario *usuario, const char *descripcion) {
-	strncpy(usuario->movimientos[usuario->indice_movimientos % MAX_MOVIMIENTOS], descripcion, 50);
-	usuario->indice_movimientos++;
-}
-
-
-void registrarFechaMovimiento(Usuario *usuario) {
-	time_t ahora = time(NULL); // Obtiene la hora actual
-	struct tm *tiempoLocal = localtime(&ahora); // Convierte a tiempo local
-	
-	// Guarda la fecha y hora en el índice correspondiente, usando el módulo para evitar desbordamiento
-	strftime(usuario->fechas[(usuario->indice_movimientos-1) % MAX_MOVIMIENTOS], 20, "%d/%m/%Y %H:%M", tiempoLocal);
-	
-	// Incrementa el índice de movimientos
-	
-}
+// Función Exportar Archivo .txt
 void exportarEstadoDeCuenta(int indice) {
 	FILE *archivo = fopen("EstadoCuenta.txt", "w");
 	if (archivo == NULL) {
@@ -387,6 +403,26 @@ void exportarEstadoDeCuenta(int indice) {
 	system("pause");
 }
 
+// Función Registrar Movimientos
+void registrarMovimiento(Usuario *usuario, const char *descripcion) {
+	strncpy(usuario->movimientos[usuario->indice_movimientos % MAX_MOVIMIENTOS], descripcion, 50);
+	usuario->indice_movimientos++;
+}
+
+// Función Registrar Fecha de Movimientos
+void registrarFechaMovimiento(Usuario *usuario) {
+	time_t ahora = time(NULL); // Obtiene la hora actual
+	struct tm *tiempoLocal = localtime(&ahora); // Convierte a tiempo local
+	
+	// Guarda la fecha y hora en el índice correspondiente, usando el módulo para evitar desbordamiento
+	strftime(usuario->fechas[(usuario->indice_movimientos-1) % MAX_MOVIMIENTOS], 20, "%d/%m/%Y %H:%M", tiempoLocal);
+	
+	// Incrementa el índice de movimientos
+	
+}
+
+// Funciones para Validar y Corregir Errores
+
 int validarMultiploDe10(int cantidad) {
 	return cantidad % 10 == 0;
 }
@@ -403,13 +439,12 @@ int obtenerNumero(const char *mensaje) {
 	return numero;
 }
 
-// Nueva función para ingresar la contraseña con asteriscos
 void obtenerContrasena(const char *mensaje, char *contrasena, int tamano) {
 	printf("%s", mensaje);
 	int i = 0;
 	char ch;
-	while ((ch = getch()) != '\r') {  // getch() lee sin mostrar el caracter
-		if (ch == '\b' && i > 0) {    // Si se presiona backspace
+	while ((ch = getch()) != '\r') {  
+		if (ch == '\b' && i > 0) {   
 			printf("\b \b");
 			i--;
 		} else if (ch != '\b' && i < tamano - 1) {
@@ -425,8 +460,24 @@ int verificarContrasena(int indice) {
 	char contrasenaIngresada[20];
 	obtenerContrasena("Ingrese su contraseña: ", contrasenaIngresada, 20);
 	if (strcmp(usuarios[indice].contrasena, contrasenaIngresada) == 0) {
-		usuarios[indice].intentos_fallidos = 0;  // Restablecer intentos fallidos
+		usuarios[indice].intentos_fallidos = 0; 
 		return 1;
 	}
 	return strcmp(usuarios[indice].contrasena, contrasenaIngresada) == 0;
+}
+
+// Función para mostrar el contador dinámico
+void mostrarContador(int segundos_restantes) {
+	for (int i = segundos_restantes; i > 0; i--) {
+		system("cls"); // Limpia la pantalla (usar printf("\033[H\033[J") en Linux/MacOS)
+		int horas = i / 3600;
+		int minutos = (i % 3600) / 60;
+		int segundos = i % 60;
+		
+		printf("**************************************\n");
+		printf("*         CUENTA BLOQUEADA           *\n");
+		printf("**************************************\n");
+		printf("\nTiempo restante para desbloquear: %02d:%02d:%02d\n", horas, minutos, segundos);
+		Sleep(1000); 
+	}
 }
