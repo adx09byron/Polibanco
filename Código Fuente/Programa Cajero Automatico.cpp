@@ -301,7 +301,7 @@ void realizarTransferencia(int indice) {
 	
 	if (monto > usuarios[indice].saldo) {
 		printf("\nEl monto supera el saldo disponible en tu cuenta.\n");
-	} else if (monto >= 400) {
+	} else if (monto > 400) {
 		printf("\nExcede el monto permitido de $400.\n");
 	} else {
 		// Actualizar saldos
