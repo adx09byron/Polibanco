@@ -130,6 +130,9 @@ int main() {
 			exportarEstadoDeCuenta(indiceUsuario); // Nueva opción para exportar
 			break;
 		case 6:
+			printf("En mantenimiento, regrese al menu principal.");
+			break;
+		case 7:
 			printf("\nGracias por usar el cajero automático.\n");
 			break;
 		default:
@@ -149,7 +152,8 @@ void mostrarMenuPrincipal() {
 	printf("3. Transferencia\n");
 	printf("4. Estado de Cuenta\n");
 	printf("5. Exportar Estado de Cuenta\n");
-	printf("6. Salir\n");
+	printf("6. Pago de servicios\n");
+	printf("7. Salir\n");
 }
 
 //Función Inicializar Usuarios
@@ -469,7 +473,7 @@ int verificarContrasena(int indice) {
 // Función para mostrar el contador dinámico
 void mostrarContador(int segundos_restantes) {
 	for (int i = segundos_restantes; i > 0; i--) {
-		system("cls"); // Limpia la pantalla (usar printf("\033[H\033[J") en Linux/MacOS)
+		system("cls"); 
 		int horas = i / 3600;
 		int minutos = (i % 3600) / 60;
 		int segundos = i % 60;
